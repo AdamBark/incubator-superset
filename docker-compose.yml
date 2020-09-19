@@ -71,6 +71,9 @@ services:
       - 'traefik.http.routers.supersetsecure.tls.certResolver=le'
       - 'traefik.http.middlewares.tohttps.redirectscheme.scheme=https'
       - 'traefik.http.services.superset.loadbalancer.server.port=8088'
+    networks:
+      - default
+      - reverseproxy
 
   superset-init:
     build: *superset-build
@@ -119,3 +122,8 @@ volumes:
     external: false
   redis:
     external: false
+
+networks:
+  reverseproxy:
+    external:
+      name: edgerouter_default
