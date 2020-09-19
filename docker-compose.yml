@@ -57,10 +57,20 @@ services:
     container_name: superset_app
     command: ["flask", "run", "-p", "8088", "--with-threads", "--reload", "--debugger", "--host=0.0.0.0"]
     restart: unless-stopped
-    ports:
-      - 8088:8088
+    #ports:
+    #  - 8088:8088
     depends_on: *superset-depends-on
     volumes: *superset-volumes
+    labels:
+      - 'traefik.http.routers.superset.entryPoints=web'
+      - 'traefik.http.routers.superset.rule=Host("data.thecity.tech")'
+      - 'traefik.http.routers.superset.middlewares=tohttps'
+      - 'traefik.http.routers.supersetsecure.entryPoints=websecure'
+      - 'traefik.http.routers.supersetsecure.rule=Host("data.thecity.tech")'
+      - 'traefik.http.routers.supersetsecure.tls=true'
+      - 'traefik.http.routers.supersetsecure.tls.certResolver=le'
+      - 'traefik.http.middlewares.tohttps.redirectscheme.scheme=https'
+      - 'traefik.http.services.superset.loadbalancer.server.port=8088'
 
   superset-init:
     build: *superset-build
